@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTubeを複数窓で見れるやつ</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #0a0a0f;
+      color: #f0f0f8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* 背景のアニメーションオーブ */
+    .bg-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.35;
+      animation: float 18s ease-in-out infinite alternate;
+    }
+    .orb-1 {
+      width: 450px;
+      height: 450px;
+      background: #ff0055;
+      top: -100px;
+      left: -100px;
+    }
+    .orb-2 {
+      width: 500px;
+      height: 500px;
+      background: #7928ca;
+      bottom: -150px;
+      right: -100px;
+      animation-delay: -9s;
+    }
+    @keyframes float {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(80px, 60px) scale(1.1); }
+    }
+
+    /* トップ画面スタイル */
+    #top-view {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: fadeIn 0.6s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ロゴエリア */
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .logo-img {
+      width: 480px;
+      max-width: 95%;
+      height: auto;
+      margin-bottom: 16px;
+      border-radius: 16px;
+      filter: drop-shadow(0 0 35px rgba(255, 0, 85, 0.55));
+      transition: transform 0.3s ease;
+    }
+    .logo-img:hover {
+      transform: scale(1.02);
+    }
+    .logo-subtitle {
+      font-size: 15px;
+      color: #9090a8;
+      max-width: 500px;
+      letter-spacing: 0.5px;
+    }
+
+    /* グラスモーフィズムカード共通 */
+    .glass-card {
+      background: rgba(20, 20, 30, 0.55);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    /* 使い方カード */
+    .usage-card {
+      width: 100%;
+      padding: 24px 28px;
+      margin-bottom: 28px;
+    }
+    .usage-card h2 {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #ff3377;
+      margin-bottom: 14px;
+    }
+    .usage-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+    }
+    .usage-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      color: #c0c0d8;
+      line-height: 1.5;
+    }
+    .usage-item strong {
+      color: #fff;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    /* フォームカード */
+    .input-form {
+      width: 100%;
+      padding: 32px;
+    }
+    .input-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+      align-items: center;
+    }
+    .input-group label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #ff3377;
+      width: 65px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .input-group input {
+      flex: 1;
+      padding: 12px 16px;
+      background: rgba(10, 10, 15, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 14px;
+      transition: all 0.25s ease;
+    }
+    .input-group input:focus {
+      outline: none;
+      border-color: #ff3377;
+      box-shadow: 0 0 15px rgba(255, 51, 119, 0.3);
+      background: rgba(15, 15, 22, 0.9);
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 24px;
+      gap: 12px;
+      align-items: center;
+    }
+    .btn-add-field {
+      background: rgba(255, 255, 255, 0.05);
+      color: #e0e0f0;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 12px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .btn-add-field:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .btn-submit {
+      background: linear-gradient(135deg, #ff0055, #ff416c);
+      color: #fff;
+      font-weight: 700;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 15px;
+      box-shadow: 0 8px 25px rgba(255, 0, 85, 0.4);
+      transition: all 0.25s ease;
+      letter-spacing: 0.5px;
+    }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(255, 0, 85, 0.6);
+      background: linear-gradient(135deg, #ff1a66, #ff527b);
+    }
+
+    /* 視聴画面スタイル */
+    #player-view {
+      display: none;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      background: #000;
+    }
+    header {
+      background-color: rgba(15, 15, 22, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 10px 20px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+      z-index: 10;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      flex-shrink: 0;
+    }
+    .header-logo {
+      font-weight: 800;
+      font-size: 14px;
+      color: #ff3377;
+      white-space: nowrap;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 6px;
+      background: rgba(255, 51, 119, 0.1);
+      transition: background 0.2s;
+    }
+    .header-logo:hover {
+      background: rgba(255, 51, 119, 0.2);
+    }
+    header input[type="text"] {
+      flex: 1;
+      padding: 8px 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 6px;
+      background-color: rgba(255,255,255,0.05);
+      color: #fff;
+      font-size: 13px;
+    }
+    header button {
+      padding: 8px 18px;
+      border: none;
+      border-radius: 6px;
+      background-color: #ff0055;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    header button:hover {
+      background-color: #ff2277;
+    }
+
+    /* プルダウンメニュー（背景をダーク色に固定） */
+    .grid-select {
+      padding: 8px 12px;
+      background-color: #1a1a24;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .grid-select option {
+      background-color: #1a1a24;
+      color: #ffffff;
+      padding: 8px;
+    }
+
+    #container {
+      flex: 1;
+      display: grid;
+      gap: 8px;
+      padding: 8px;
+      height: calc(100vh - 56px);
+    }
+
+    .grid-auto { grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); }
+    .grid-1 { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+    .grid-2 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
+    .grid-3 { grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr; }
+    .grid-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+    .grid-6 { grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; }
+    .grid-8 { grid-template-columns: repeat(4, 1fr); grid-template-rows: 1fr 1fr; }
+
+    /* 動画カード */
+    .video-card {
+      position: relative;
+      background-color: #121218;
+      border-radius: 8px;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* 削除バー */
+    .card-top-bar {
+      height: 28px;
+      background: #181822;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      flex-shrink: 0;
+    }
+    .remove-btn {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #ff6677;
+      border: none;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+    .remove-btn:hover {
+      background-color: #ff3344;
+      color: #ffffff;
+    }
+
+    /* 動画プレイヤーエリア */
+    .player-wrapper {
+      flex: 1;
+      width: 100%;
+      height: calc(100% - 28px);
+      position: relative;
+    }
+    
+    .player-wrapper div[id^="player-"],
+    .player-wrapper iframe {
+      width: 100% !important;
+      height: 100% !important;
+      border: none;
+    }
+  </style>
+  <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body>
+
+  <!-- 背景グロー -->
+  <div class="bg-glow">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <!-- トップ画面 -->
+  <div id="top-view">
+    <div class="logo-container">
+      <img src="logo.png" alt="YouTubeを複数窓で見れるやつ" class="logo-img" onerror="this.style.display='none'">
+      <div class="logo-subtitle">複数のライブ配信や動画を同時に、ストレスなく快適に視聴</div>
+    </div>
+
+    <div class="glass-card usage-card">
+      <h2>HOW TO USE</h2>
+      <div class="usage-grid">
+        <div class="usage-item">
+          <strong>1. URLを入力</strong>
+          見たいYouTube（動画/ライブ）のリンクを貼ります。
+        </div>
+        <div class="usage-item">
+          <strong>2. 枠を追加</strong>
+          最大8つまで同時にセット可能です。
+        </div>
+        <div class="usage-item">
+          <strong>3. マルチ再生</strong>
+          「作成する」を押せば一括起動します。
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-card input-form">
+      <div id="url-fields">
+        <div class="input-group">
+          <label>URL 01</label>
+          <input type="text" class="init-url" placeholder="https://www.youtube.com/watch?v=...">
+        </div>
+        <div class="input-group">
+          <label>URL 02</label>
+          <input type="text" class="init-url" placeholder="https://www.youtube.com/watch?v=...">
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-add-field" id="btn-add" onclick="addField()">＋ 入力欄を追加 (最大8)</button>
+        <button class="btn-submit" onclick="startMultiView()">マルチ動画を作成する ➔</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 視聴画面 -->
+  <div id="player-view">
+    <header>
+      <div class="header-logo" onclick="backToTop()">◀ トップへ戻る</div>
+      <input type="text" id="headerVideoUrl" placeholder="追加したいYouTube URLまたは動画ID">
+      <button onclick="addSingleVideoFromHeader()">追加</button>
+      <select id="gridLayout" class="grid-select" onchange="changeGrid(this.value)">
+        <option value="grid-auto">自動サイズ調整</option>
+        <option value="grid-1">1画面</option>
+        <option value="grid-2">2画面</option>
+        <option value="grid-3">3画面</option>
+        <option value="grid-4" selected>4画面 (2×2)</option>
+        <option value="grid-6">6画面 (3×2)</option>
+        <option value="grid-8">8画面 (4×2)</option>
+      </select>
+    </header>
+
+    <div id="container" class="grid-4"></div>
+  </div>
+
+  <script>
+    let playerCount = 0;
+    let fieldCount = 2;
+
+    function extractVideoId(url) {
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|live\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = url.match(regExp);
+      return (match && match[2].length === 11) ? match[2] : url;
+    }
+
+    function addField() {
+      if (fieldCount >= 8) return;
+      fieldCount++;
+      const fieldsContainer = document.getElementById('url-fields');
+      const div = document.createElement('div');
+      div.className = 'input-group';
+      const numStr = fieldCount < 10 ? `0${fieldCount}` : fieldCount;
+      div.innerHTML = `
+        <label>URL ${numStr}</label>
+        <input type="text" class="init-url" placeholder="https://www.youtube.com/watch?v=...">
+      `;
+      fieldsContainer.appendChild(div);
+
+      if (fieldCount >= 8) {
+        document.getElementById('btn-add').style.display = 'none';
+      }
+    }
+
+    function startMultiView() {
+      const inputs = document.querySelectorAll('.init-url');
+      const urls = [];
+      inputs.forEach(input => {
+        const val = input.value.trim();
+        if (val) urls.push(val);
+      });
+
+      if (urls.length === 0) {
+        alert('少なくとも1つのYouTube URLを入力してください。');
+        return;
+      }
+
+      document.getElementById('top-view').style.display = 'none';
+      document.getElementById('player-view').style.display = 'flex';
+
+      const gridSelect = document.getElementById('gridLayout');
+      if (urls.length === 1) gridSelect.value = 'grid-1';
+      else if (urls.length === 2) gridSelect.value = 'grid-2';
+      else if (urls.length === 3) gridSelect.value = 'grid-3';
+      else if (urls.length === 4) gridSelect.value = 'grid-4';
+      else if (urls.length <= 6) gridSelect.value = 'grid-6';
+      else gridSelect.value = 'grid-8';
+      changeGrid(gridSelect.value);
+
+      urls.forEach(url => createPlayer(url));
+    }
+
+    function createPlayer(rawUrl) {
+      const videoId = extractVideoId(rawUrl);
+      if (!videoId) return;
+
+      playerCount++;
+      const playerId = `player-${playerCount}`;
+      const container = document.getElementById('container');
+
+      const card = document.createElement('div');
+      card.className = 'video-card';
+      card.innerHTML = `
+        <div class="card-top-bar">
+          <button class="remove-btn" onclick="removeVideo(this)">✕ 削除</button>
+        </div>
+        <div class="player-wrapper">
+          <div id="${playerId}"></div>
+        </div>
+      `;
+
+      container.appendChild(card);
+
+      if (window.YT && window.YT.Player) {
+        new YT.Player(playerId, {
+          videoId: videoId,
+          playerVars: {
+            autoplay: 1,
+            mute: 1,
+            playsinline: 1
+          }
+        });
+      }
+    }
+
+    function addSingleVideoFromHeader() {
+      const input = document.getElementById('headerVideoUrl');
+      const val = input.value.trim();
+      if (val) {
+        createPlayer(val);
+        input.value = '';
+      }
+    }
+
+    function removeVideo(btn) {
+      const card = btn.closest('.video-card');
+      card.remove();
+    }
+
+    function changeGrid(className) {
+      document.getElementById('container').className = className;
+    }
+
+    function backToTop() {
+      if (confirm('トップ画面に戻りますか？（視聴中の動画はクリアされます）')) {
+        document.getElementById('container').innerHTML = '';
+        document.getElementById('player-view').style.display = 'none';
+        document.getElementById('top-view').style.display = 'flex';
+      }
+    }
+
+    document.getElementById('headerVideoUrl').addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') addSingleVideoFromHeader();
+    });
+  </script>
+</body>
+</html>
