@@ -200,6 +200,7 @@
       display: none;
       flex-direction: column;
       height: 100vh;
+      height: 100dvh; /* スマホの動的アドレスバー対応 */
       overflow: hidden;
       background: #000;
     }
@@ -270,14 +271,16 @@
       color: #ffffff;
     }
 
+    /* 滑らかな慣性スクロールコンテナ */
     #container {
       flex: 1;
       display: grid;
-      gap: 12px;
-      padding: 8px;
-      overflow-y: auto;
+      gap: 16px;
+      padding: 12px;
+      overflow-y: scroll;
       -webkit-overflow-scrolling: touch;
       align-content: start;
+      overscroll-behavior-y: contain;
     }
 
     /* PC用の標準グリッド設定 */
@@ -289,11 +292,11 @@
     .grid-6 { grid-template-columns: 1fr 1fr 1fr; }
     .grid-8 { grid-template-columns: repeat(4, 1fr); }
 
-    /* ★画面幅768px以下（スマホ縦持ち）の完全最適化★ */
+    /* スマホ縦持ち時の完全1列指定 */
     @media (max-width: 768px) {
       #container {
-        grid-template-columns: 1fr !important; /* 強制的に1列縦並びに */
-        gap: 16px;
+        grid-template-columns: 1fr !important;
+        padding: 12px 10px 40px 10px;
       }
     }
 
@@ -301,24 +304,35 @@
     .video-card {
       position: relative;
       background-color: #121218;
-      border-radius: 8px;
+      border-radius: 10px;
       overflow: hidden;
       width: 100%;
       display: flex;
       flex-direction: column;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     }
 
-    /* 削除バー */
+    /* タッチ・スクロールしやすい削除兼グリップバー */
     .card-top-bar {
-      height: 32px;
-      background: #181822;
+      height: 36px;
+      background: #1c1c28;
       display: flex;
       align-items: center;
-      justify-content: flex-end;
-      padding: 0 10px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      justify-content: space-between;
+      padding: 0 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       flex-shrink: 0;
+      touch-action: pan-y; /* このバーでスムーズにスクロール可能 */
+    }
+    .drag-handle {
+      font-size: 11px;
+      color: #707088;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
     .remove-btn {
       background-color: rgba(255, 255, 255, 0.12);
@@ -331,7 +345,7 @@
       font-weight: 700;
     }
 
-    /* 動画プレイヤー領域（アスペクト比 16:9 を完全維持） */
+    /* 動画プレイヤー領域 */
     .player-wrapper {
       width: 100%;
       aspect-ratio: 16 / 9;
@@ -493,6 +507,7 @@
       card.className = 'video-card';
       card.innerHTML = `
         <div class="card-top-bar">
+          <span class="drag-handle">≡ VIDEO ${playerCount}</span>
           <button class="remove-btn" onclick="removeVideo(this)">✕ 削除</button>
         </div>
         <div class="player-wrapper">
