@@ -199,20 +199,23 @@
     #player-view {
       display: none;
       flex-direction: column;
-      height: 100vh;
-      height: 100dvh;
-      overflow: hidden;
+      min-height: 100vh;
+      min-height: 100dvh;
       background: #000;
     }
 
+    /* ヘッダーを画面最上部に常時固定 */
     header {
+      position: sticky;
+      top: 0;
       background-color: rgba(15, 15, 22, 0.98);
+      backdrop-filter: blur(12px);
       padding: 8px 12px;
       display: flex;
       gap: 8px;
       align-items: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.8);
-      z-index: 10;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+      z-index: 100;
       border-bottom: 1px solid rgba(255,255,255,0.08);
       flex-wrap: wrap;
       flex-shrink: 0;
@@ -271,15 +274,13 @@
       color: #ffffff;
     }
 
+    /* 動画コンテナ（ページ自然スクロールと親和させる） */
     #container {
       flex: 1;
       display: grid;
       gap: 16px;
       padding: 12px;
-      overflow-y: scroll;
-      -webkit-overflow-scrolling: touch;
       align-content: start;
-      overscroll-behavior-y: contain;
     }
 
     .grid-auto { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
@@ -342,11 +343,11 @@
       font-weight: 700;
     }
 
-    /* ★動画プレイヤー領域（パーセンテージ比率で16:9を完全維持）★ */
+    /* 動画プレイヤー領域（16:9完全維持） */
     .player-wrapper {
       width: 100%;
       height: 0;
-      padding-top: 56.25%; /* 16:9 の完全比率レスポンシブ */
+      padding-top: 56.25%;
       position: relative;
       background: #000;
     }
