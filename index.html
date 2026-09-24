@@ -2,13 +2,14 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>YouTubeを複数窓で見れるやつ</title>
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -34,195 +35,167 @@
     .orb {
       position: absolute;
       border-radius: 50%;
-      filter: blur(90px);
-      opacity: 0.35;
+      filter: blur(80px);
+      opacity: 0.3;
       animation: float 18s ease-in-out infinite alternate;
     }
     .orb-1 {
-      width: 450px;
-      height: 450px;
+      width: 300px;
+      height: 300px;
       background: #ff0055;
-      top: -100px;
-      left: -100px;
+      top: -50px;
+      left: -50px;
     }
     .orb-2 {
-      width: 500px;
-      height: 500px;
+      width: 350px;
+      height: 350px;
       background: #7928ca;
-      bottom: -150px;
-      right: -100px;
+      bottom: -80px;
+      right: -50px;
       animation-delay: -9s;
     }
     @keyframes float {
       0% { transform: translate(0, 0) scale(1); }
-      100% { transform: translate(80px, 60px) scale(1.1); }
+      100% { transform: translate(40px, 30px) scale(1.1); }
     }
 
-    /* トップ画面スタイル */
+    /* --- トップ画面スタイル --- */
     #top-view {
-      max-width: 860px;
+      max-width: 800px;
       margin: 0 auto;
-      padding: 40px 24px;
+      padding: 24px 16px;
       width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      animation: fadeIn 0.6s ease-out;
+      animation: fadeIn 0.4s ease-out;
     }
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(15px); }
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* ロゴエリア */
     .logo-container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
       text-align: center;
     }
     .logo-img {
-      width: 480px;
-      max-width: 95%;
+      width: 100%;
+      max-width: 380px;
       height: auto;
-      margin-bottom: 16px;
-      border-radius: 16px;
-      filter: drop-shadow(0 0 35px rgba(255, 0, 85, 0.55));
-      transition: transform 0.3s ease;
-    }
-    .logo-img:hover {
-      transform: scale(1.02);
+      margin-bottom: 12px;
+      border-radius: 12px;
+      filter: drop-shadow(0 0 25px rgba(255, 0, 85, 0.5));
     }
     .logo-subtitle {
-      font-size: 15px;
+      font-size: 13px;
       color: #9090a8;
-      max-width: 500px;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
+      padding: 0 10px;
     }
 
-    /* グラスモーフィズムカード共通 */
     .glass-card {
-      background: rgba(20, 20, 30, 0.55);
+      background: rgba(20, 20, 30, 0.65);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 20px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     }
 
-    /* 使い方カード */
     .usage-card {
       width: 100%;
-      padding: 24px 28px;
-      margin-bottom: 28px;
+      padding: 18px;
+      margin-bottom: 20px;
     }
     .usage-card h2 {
-      font-size: 14px;
+      font-size: 12px;
       text-transform: uppercase;
-      letter-spacing: 1.5px;
+      letter-spacing: 1.2px;
       color: #ff3377;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
     .usage-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
     }
     .usage-item {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.05);
-      padding: 12px 16px;
-      border-radius: 12px;
-      font-size: 13px;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 12px;
       color: #c0c0d8;
-      line-height: 1.5;
+      line-height: 1.4;
     }
     .usage-item strong {
       color: #fff;
       display: block;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
-    /* フォームカード */
     .input-form {
       width: 100%;
-      padding: 32px;
+      padding: 20px 16px;
     }
     .input-group {
       display: flex;
-      gap: 12px;
-      margin-bottom: 14px;
+      gap: 8px;
+      margin-bottom: 12px;
       align-items: center;
     }
     .input-group label {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
       color: #ff3377;
-      width: 65px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      width: 55px;
+      flex-shrink: 0;
     }
     .input-group input {
       flex: 1;
-      padding: 12px 16px;
-      background: rgba(10, 10, 15, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 10px;
+      padding: 12px;
+      background: rgba(10, 10, 15, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
       color: #fff;
       font-size: 14px;
-      transition: all 0.25s ease;
-    }
-    .input-group input:focus {
-      outline: none;
-      border-color: #ff3377;
-      box-shadow: 0 0 15px rgba(255, 51, 119, 0.3);
-      background: rgba(15, 15, 22, 0.9);
     }
 
     .form-actions {
       display: flex;
-      justify-content: space-between;
-      margin-top: 24px;
-      gap: 12px;
-      align-items: center;
+      flex-direction: column;
+      margin-top: 18px;
+      gap: 10px;
     }
     .btn-add-field {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.06);
       color: #e0e0f0;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      padding: 12px 20px;
-      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 12px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 13px;
       font-weight: 600;
-      transition: all 0.2s ease;
-    }
-    .btn-add-field:hover {
-      background: rgba(255, 255, 255, 0.12);
-      color: #fff;
-      border-color: rgba(255, 255, 255, 0.25);
+      text-align: center;
     }
     .btn-submit {
       background: linear-gradient(135deg, #ff0055, #ff416c);
       color: #fff;
       font-weight: 700;
       border: none;
-      padding: 14px 32px;
-      border-radius: 10px;
+      padding: 14px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 15px;
-      box-shadow: 0 8px 25px rgba(255, 0, 85, 0.4);
-      transition: all 0.25s ease;
-      letter-spacing: 0.5px;
-    }
-    .btn-submit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 30px rgba(255, 0, 85, 0.6);
-      background: linear-gradient(135deg, #ff1a66, #ff527b);
+      box-shadow: 0 4px 20px rgba(255, 0, 85, 0.4);
+      text-align: center;
     }
 
-    /* 視聴画面スタイル */
+    /* --- 視聴画面スタイル --- */
     #player-view {
       display: none;
       flex-direction: column;
@@ -230,43 +203,47 @@
       overflow: hidden;
       background: #000;
     }
+
     header {
-      background-color: rgba(15, 15, 22, 0.95);
-      backdrop-filter: blur(10px);
-      padding: 10px 20px;
+      background-color: rgba(15, 15, 22, 0.98);
+      padding: 8px 12px;
       display: flex;
-      gap: 12px;
+      gap: 8px;
       align-items: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.8);
       z-index: 10;
       border-bottom: 1px solid rgba(255,255,255,0.08);
-      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+    .header-top-row {
+      display: flex;
+      width: 100%;
+      gap: 8px;
+      align-items: center;
     }
     .header-logo {
       font-weight: 800;
-      font-size: 14px;
+      font-size: 12px;
       color: #ff3377;
       white-space: nowrap;
       cursor: pointer;
-      padding: 6px 12px;
+      padding: 6px 10px;
       border-radius: 6px;
-      background: rgba(255, 51, 119, 0.1);
-      transition: background 0.2s;
-    }
-    .header-logo:hover {
-      background: rgba(255, 51, 119, 0.2);
+      background: rgba(255, 51, 119, 0.12);
+      flex-shrink: 0;
     }
     header input[type="text"] {
       flex: 1;
-      padding: 8px 14px;
-      border: 1px solid rgba(255,255,255,0.12);
+      padding: 8px 10px;
+      border: 1px solid rgba(255,255,255,0.15);
       border-radius: 6px;
-      background-color: rgba(255,255,255,0.05);
+      background-color: rgba(255,255,255,0.08);
       color: #fff;
       font-size: 13px;
+      min-width: 0;
     }
     header button {
-      padding: 8px 18px;
+      padding: 8px 14px;
       border: none;
       border-radius: 6px;
       background-color: #ff0055;
@@ -274,26 +251,22 @@
       font-weight: 700;
       cursor: pointer;
       white-space: nowrap;
-      transition: background 0.2s;
+      font-size: 12px;
+      flex-shrink: 0;
     }
-    header button:hover {
-      background-color: #ff2277;
-    }
-
-    /* プルダウンメニュー（背景をダーク色に固定） */
     .grid-select {
-      padding: 8px 12px;
+      padding: 6px 10px;
       background-color: #1a1a24;
       color: #ffffff;
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 6px;
-      font-size: 13px;
+      font-size: 12px;
       cursor: pointer;
+      margin-left: auto;
     }
     .grid-select option {
       background-color: #1a1a24;
       color: #ffffff;
-      padding: 8px;
     }
 
     #container {
@@ -301,16 +274,29 @@
       display: grid;
       gap: 8px;
       padding: 8px;
-      height: calc(100vh - 56px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
-    .grid-auto { grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); }
+    /* スマホ・PC共通のレスポンシブグリッド */
+    .grid-auto { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
     .grid-1 { grid-template-columns: 1fr; grid-template-rows: 1fr; }
-    .grid-2 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
-    .grid-3 { grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr; }
+    .grid-2 { grid-template-columns: 1fr 1fr; }
+    .grid-3 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
     .grid-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
-    .grid-6 { grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; }
-    .grid-8 { grid-template-columns: repeat(4, 1fr); grid-template-rows: 1fr 1fr; }
+    .grid-6 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+    .grid-8 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+
+    /* スマホ縦画面（幅600px以下）に自動最適化 */
+    @media (max-width: 600px) {
+      .grid-2, .grid-4 {
+        grid-template-columns: 1fr !important;
+        grid-template-rows: none !important;
+      }
+      .video-card {
+        height: 240px !important;
+      }
+    }
 
     /* 動画カード */
     .video-card {
@@ -320,43 +306,39 @@
       overflow: hidden;
       width: 100%;
       height: 100%;
+      min-height: 200px;
       display: flex;
       flex-direction: column;
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    /* 削除バー */
+    /* 削除バー（指で押しやすいサイズ感） */
     .card-top-bar {
-      height: 28px;
+      height: 32px;
       background: #181822;
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      padding: 0 8px;
+      padding: 0 10px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       flex-shrink: 0;
     }
     .remove-btn {
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: rgba(255, 255, 255, 0.12);
       color: #ff6677;
       border: none;
-      padding: 2px 8px;
+      padding: 4px 10px;
       border-radius: 4px;
       font-size: 11px;
       cursor: pointer;
       font-weight: 700;
-      transition: all 0.2s;
-    }
-    .remove-btn:hover {
-      background-color: #ff3344;
-      color: #ffffff;
     }
 
-    /* 動画プレイヤーエリア */
+    /* 動画プレイヤー領域 */
     .player-wrapper {
       flex: 1;
       width: 100%;
-      height: calc(100% - 28px);
+      height: calc(100% - 32px);
       position: relative;
     }
     
@@ -381,7 +363,7 @@
   <div id="top-view">
     <div class="logo-container">
       <img src="logo.png" alt="YouTubeを複数窓で見れるやつ" class="logo-img" onerror="this.style.display='none'">
-      <div class="logo-subtitle">複数のライブ配信や動画を同時に、ストレスなく快適に視聴</div>
+      <div class="logo-subtitle">複数のライブ配信や動画を同時にストレスなく快適に視聴</div>
     </div>
 
     <div class="glass-card usage-card">
@@ -389,11 +371,11 @@
       <div class="usage-grid">
         <div class="usage-item">
           <strong>1. URLを入力</strong>
-          見たいYouTube（動画/ライブ）のリンクを貼ります。
+          YouTube（動画/ライブ）リンクを貼ります。
         </div>
         <div class="usage-item">
           <strong>2. 枠を追加</strong>
-          最大8つまで同時にセット可能です。
+          最大8つまでセット可能です。
         </div>
         <div class="usage-item">
           <strong>3. マルチ再生</strong>
@@ -424,9 +406,11 @@
   <!-- 視聴画面 -->
   <div id="player-view">
     <header>
-      <div class="header-logo" onclick="backToTop()">◀ トップへ戻る</div>
-      <input type="text" id="headerVideoUrl" placeholder="追加したいYouTube URLまたは動画ID">
-      <button onclick="addSingleVideoFromHeader()">追加</button>
+      <div class="header-top-row">
+        <div class="header-logo" onclick="backToTop()">◀ トップ</div>
+        <input type="text" id="headerVideoUrl" placeholder="URLまたは動画ID">
+        <button onclick="addSingleVideoFromHeader()">追加</button>
+      </div>
       <select id="gridLayout" class="grid-select" onchange="changeGrid(this.value)">
         <option value="grid-auto">自動サイズ調整</option>
         <option value="grid-1">1画面</option>
