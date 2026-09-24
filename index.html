@@ -200,7 +200,7 @@
       display: none;
       flex-direction: column;
       height: 100vh;
-      height: 100dvh; /* スマホの動的アドレスバー対応 */
+      height: 100dvh;
       overflow: hidden;
       background: #000;
     }
@@ -271,7 +271,6 @@
       color: #ffffff;
     }
 
-    /* 滑らかな慣性スクロールコンテナ */
     #container {
       flex: 1;
       display: grid;
@@ -283,7 +282,6 @@
       overscroll-behavior-y: contain;
     }
 
-    /* PC用の標準グリッド設定 */
     .grid-auto { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
     .grid-1 { grid-template-columns: 1fr; }
     .grid-2 { grid-template-columns: 1fr 1fr; }
@@ -292,7 +290,6 @@
     .grid-6 { grid-template-columns: 1fr 1fr 1fr; }
     .grid-8 { grid-template-columns: repeat(4, 1fr); }
 
-    /* スマホ縦持ち時の完全1列指定 */
     @media (max-width: 768px) {
       #container {
         grid-template-columns: 1fr !important;
@@ -313,17 +310,17 @@
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     }
 
-    /* タッチ・スクロールしやすい削除兼グリップバー */
+    /* 削除バー */
     .card-top-bar {
-      height: 36px;
-      background: #1c1c28;
+      height: 32px;
+      background: #181822;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 12px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       flex-shrink: 0;
-      touch-action: pan-y; /* このバーでスムーズにスクロール可能 */
+      touch-action: pan-y;
     }
     .drag-handle {
       font-size: 11px;
@@ -345,22 +342,23 @@
       font-weight: 700;
     }
 
-    /* 動画プレイヤー領域 */
+    /* ★動画プレイヤー領域（パーセンテージ比率で16:9を完全維持）★ */
     .player-wrapper {
       width: 100%;
-      aspect-ratio: 16 / 9;
+      height: 0;
+      padding-top: 56.25%; /* 16:9 の完全比率レスポンシブ */
       position: relative;
       background: #000;
     }
     
     .player-wrapper div[id^="player-"],
     .player-wrapper iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
       width: 100% !important;
       height: 100% !important;
-      border: none;
+      border: none !important;
     }
   </style>
   <script src="https://www.youtube.com/iframe_api"></script>
