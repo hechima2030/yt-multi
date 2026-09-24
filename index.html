@@ -204,7 +204,6 @@
       background: #000;
     }
 
-    /* ヘッダーを画面最上部に常時固定 */
     header {
       position: sticky;
       top: 0;
@@ -274,7 +273,6 @@
       color: #ffffff;
     }
 
-    /* 動画コンテナ（ページ自然スクロールと親和させる） */
     #container {
       flex: 1;
       display: grid;
@@ -298,7 +296,6 @@
       }
     }
 
-    /* 動画カード */
     .video-card {
       position: relative;
       background-color: #121218;
@@ -311,7 +308,6 @@
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     }
 
-    /* 削除バー */
     .card-top-bar {
       height: 32px;
       background: #181822;
@@ -343,7 +339,6 @@
       font-weight: 700;
     }
 
-    /* 動画プレイヤー領域（16:9完全維持） */
     .player-wrapper {
       width: 100%;
       height: 0;
@@ -441,6 +436,25 @@
   <script>
     let playerCount = 0;
     let fieldCount = 2;
+    let wakeLock = null;
+
+    // ★画面スリープ防止機能 (Wake Lock API)★
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLock = await navigator.wakeLock.request('screen');
+        }
+      } catch (err) {
+        console.log('Wake Lock エラー:', err);
+      }
+    }
+
+    function releaseWakeLock() {
+      if (wakeLock !== null) {
+        wakeLock.release();
+        wakeLock = null;
+      }
+    }
 
     function extractVideoId(url) {
       const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|live\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -481,6 +495,9 @@
 
       document.getElementById('top-view').style.display = 'none';
       document.getElementById('player-view').style.display = 'flex';
+
+      // 視聴開始時に画面スリープをロック
+      requestWakeLock();
 
       const gridSelect = document.getElementById('gridLayout');
       if (urls.length === 1) gridSelect.value = 'grid-1';
@@ -548,6 +565,7 @@
 
     function backToTop() {
       if (confirm('トップ画面に戻りますか？（視聴中の動画はクリアされます）')) {
+        releaseWakeLock(); // トップに戻るときスリープ指定解除
         document.getElementById('container').innerHTML = '';
         document.getElementById('player-view').style.display = 'none';
         document.getElementById('top-view').style.display = 'flex';
